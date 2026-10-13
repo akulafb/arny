@@ -64,15 +64,6 @@ Zero setup, runs in a temporary cache on the fly:
 uvx --from git+https://github.com/akulafb/arny arny "what did I work on today?"
 ```
 
-### With vs. Without Installation
-
-| | Installed (`uv tool install`) | Without Installing (`uvx`) |
-| :--- | :--- | :--- |
-| **Command** | Bare `arny "..."` | Prefixed `uvx arny "..."` |
-| **Startup** | Instant | Brief environment resolution check |
-| **Best For** | Daily use & AI app setups (Raycast, Claude, agy) | Quick trials or testing on another machine |
-| **Disk** | Symlinked in `~/.local/bin` | Runs in temporary cache, no global footprint |
-
 ---
 
 ## Connect to Your AI Apps (MCP)
