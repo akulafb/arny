@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 from arny import __version__
 from arny.tools import granola as granola_tools
+from arny.tools import history
 from arny.tools import luci as luci_tools
 
 mcp = FastMCP("arny", instructions="Life & Activity MCP Server", version=__version__)
@@ -30,6 +31,7 @@ def status() -> ServerStatus:
 
 luci_tools.register(mcp)
 granola_tools.register(mcp)
+history.register(mcp)
 
 
 def main() -> None:
