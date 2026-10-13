@@ -39,7 +39,8 @@ temp/
 
 # AI Agent local workspaces & deployed skills
 .agents/skills/
-.claude/skills/
+.claude/skills/*
+!.claude/skills/verify-arny/
 .claude/skills-disabled/
 .omp/skills/
 .skills/
