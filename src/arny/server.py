@@ -4,6 +4,7 @@ from fastmcp import FastMCP
 from pydantic import BaseModel
 
 from arny import __version__
+from arny.tools import luci as luci_tools
 
 mcp = FastMCP("arny", instructions="Life & Activity MCP Server", version=__version__)
 
@@ -24,6 +25,9 @@ def ping() -> str:
 def status() -> ServerStatus:
     """Report the server name, version and health."""
     return ServerStatus(name=mcp.name, version=__version__, status="ok")
+
+
+luci_tools.register(mcp)
 
 
 def main() -> None:
