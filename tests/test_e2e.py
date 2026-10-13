@@ -30,6 +30,7 @@ else:
 
 def _env(tmp_path: Path, *, luci: bool = True, life: bool = True) -> dict[str, str]:
     env = {k: v for k, v in os.environ.items() if k not in LLM_KEYS}
+    env["ARNY_SKIP_DOTENV"] = "1"
     env["FB_MODE_PATH"] = str(tmp_path / "runs-missing")
     env["GRANOLA_CLI_PATH"] = str(tmp_path / "no-granola")
     env["LUCI_PATH"] = str(tmp_path / "no-luci")

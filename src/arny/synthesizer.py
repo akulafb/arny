@@ -219,12 +219,18 @@ def call_llm(provider: Provider, prompt: str, env: Mapping[str, str], post: Post
             {"model": model, "messages": [{"role": "user", "content": prompt}]},
         )
         return data["choices"][0]["message"]["content"].strip()
+    gemini_body: dict[str, Any] = {"contents": [{"parts": [{"text": prompt}]}]}
+    effort = env.get("ARNY_LLM_THINKING_EFFORT", "medium").lower()
+    if effort in ("low", "medium", "high"):
+        # Map thinking effort to token budget: low=1024, medium=2048, high=4096
+        budgets = {"low": 1024, "medium": 2048, "high": 4096}
+        gemini_body["generationConfig"] = {"thinkingConfig": {"thinkingBudget": budgets[effort]}}
     data = post(
         f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
         {"x-goog-api-key": key},
-        {"contents": [{"parts": [{"text": prompt}]}]},
+        gemini_body,
     )
-    return "".join(p.get("text", "") for p in data["candidates"][0]["content"]["parts"]).strip()
+    return "".join(p.get("text", "") for p in data["candidates"][0]["content"]["parts"] if "text" in p).strip()
 
 
 def answer(

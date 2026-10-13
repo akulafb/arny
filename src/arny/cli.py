@@ -4,6 +4,7 @@
 would otherwise read a free-text question as an unknown subcommand.
 """
 
+import os
 import sys
 from pathlib import Path
 from typing import Annotated
@@ -14,9 +15,10 @@ import typer
 from arny.synthesizer import answer, gather
 
 # Automatically load .env from current directory, ~/.arny/.env, or ~/.env if present
-for env_path in [Path.cwd() / ".env", Path.home() / ".arny" / ".env", Path.home() / ".env"]:
-    if env_path.is_file():
-        load_dotenv(env_path)
+if not os.environ.get("ARNY_SKIP_DOTENV"):
+    for env_path in [Path.cwd() / ".env", Path.home() / ".arny" / ".env", Path.home() / ".env"]:
+        if env_path.is_file():
+            load_dotenv(env_path)
 
 app = typer.Typer(help="Arny: Life & Activity assistant.", no_args_is_help=True)
 
