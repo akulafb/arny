@@ -1,8 +1,10 @@
 # Arny
 
-**Arny** gives your AI tools and terminal memory of what you did, saw, and discussed.
+- **What is it:** Arny is an MCP Server that gives you quick-access to everyday context/memory-saving tools
+- **Currently built for:** Luci, Granola (maybe more later)
+- **What this means:** It's a unified way to ask about what you did/saw/heard on your computer from your favourite tools (AI agents, or my favourite, Raycast's Quick AI)
 
-Instead of copying and pasting screenshots, meeting transcripts, or daily notes into your AI prompt, Arny connects them directly to your assistant.
+ 
 
 ```mermaid
 flowchart LR
@@ -35,15 +37,16 @@ flowchart LR
 
 1. **Answers in plain language**: Run `arny "what did I discuss with Sarah today?"` in your terminal. It checks your sources and summarizes the answer with citations. If no LLM key is set, it outputs cleanly ranked excerpts.
 2. **Plugs into your favorite agents**: Runs a standard [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server so tools like **Claude Code**, **Raycast AI**, and **Antigravity CLI** can search your history automatically.
-3. **Safe & Read-Only**: Arny only reads. It never writes to, moves, or alters your personal files or databases. If a tool isn't installed or running, Arny simply displays a polite warning and keeps going.
+3. **Safe &amp; Read-Only**: Arny only reads. It never writes to, moves, or alters your personal files or databases. If a tool isn't installed or running, Arny simply displays a polite warning and keeps going.
 
 ---
 
-## Quickstart & Installation
+## Quickstart &amp; Installation
 
 You can run Arny with or without installing it:
 
 ### Option A: Install Globally (Recommended)
+
 Fastest startup, clean commands, and best for MCP apps:
 
 ```sh
@@ -58,6 +61,7 @@ arny "what did I work on today?"
 ```
 
 ### Option B: Run Without Installing (`uvx`)
+
 Zero setup, runs in a temporary cache on the fly:
 
 ```sh
@@ -71,6 +75,7 @@ uvx --from git+https://github.com/akulafb/arny arny "what did I work on today?"
 Arny provides an MCP server over stdio via `arny serve`.
 
 ### Raycast AI Chat
+
 1. In Raycast, run **Install Server** (under the MCP extension).
 2. Set **Name** to `arny`, **Command** to `uvx`, and **Arguments** to `arny serve`.
 3. In Raycast AI Chat, mention `@arny` to query your context.
@@ -84,13 +89,17 @@ Arny provides an MCP server over stdio via `arny serve`.
 ```
 
 ### Claude Code CLI
+
 Run in your terminal:
+
 ```sh
 claude mcp add arny --scope user -- uvx arny serve
 ```
 
 ### Antigravity (agy CLI)
+
 Add Arny to `~/.gemini/config/mcp_config.json`:
+
 ```json
 {
   "mcpServers": {
@@ -109,12 +118,15 @@ Add Arny to `~/.gemini/config/mcp_config.json`:
 Arny works out of the box with zero configuration by looking for default paths. You can customize behavior using environment variables:
 
 ### AI Synthesizer (Optional)
+
 When set, Arny drafts a synthesized summary. Without an API key, Arny simply shows matching excerpts.
+
 - `GEMINI_API_KEY`: Use Google Gemini.
 - `ANTHROPIC_API_KEY`: Use Claude.
 - `OPENAI_API_KEY`: Use OpenAI.
 
 ### Custom Data Paths (Optional)
+
 - `LUCI_PATH`: Custom path to `luci` binary (defaults to `~/.local/bin/luci`).
 - `GRANOLA_CLI_PATH`: Custom path to Granola Companion CLI.
 - `ARNY_GRANOLA_EXPORT_DIR`: Folder containing exported Granola CSV or Markdown notes.
@@ -123,7 +135,7 @@ When set, Arny drafts a synthesized summary. Without an API key, Arny simply sho
 
 ---
 
-## Development & Testing
+## Development &amp; Testing
 
 ```sh
 # Install dependencies
