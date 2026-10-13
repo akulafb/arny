@@ -1,87 +1,70 @@
 # Arny
 
-Arny answers questions about your own activity. It reads three sources:
+**Arny** gives your AI tools and terminal memory of what you did, saw, and discussed.
 
-- **Luci**: screen captures and audio transcripts (the `luci` CLI).
-- **Granola**: meeting notes and transcripts.
-- **History**: `~/.Life` daily reports, meetings and profile, plus `~/.fb-mode` run notes.
+Instead of copying and pasting screenshots, meeting transcripts, or daily notes into your AI prompt, Arny connects them directly to your assistant.
 
-Arny only reads. It never writes to these sources. When a source is missing, Arny prints a warning and keeps going.
+```mermaid
+flowchart LR
+    subgraph You ["How You Ask"]
+        CLI["Terminal: arny '<question>'"]
+        Agents["AI Assistants: Raycast, Claude, Antigravity"]
+    end
 
-You can use Arny two ways:
+    subgraph Arny ["Arny Engine"]
+        Engine["Arny Core & FastMCP Server"]
+    end
 
-1. As a CLI: `arny "<question>"`.
-2. As an MCP server over stdio, for Raycast AI Chat, Claude Code and agy.
+    subgraph Sources ["Your Local Activity (Read-Only)"]
+        Luci["Luci\n(Screen text & audio)"]
+        Granola["Granola\n(Meetings & transcripts)"]
+        Life["History\n(~/.Life notes & reflections)"]
+    end
 
-## Install
+    CLI --> Engine
+    Agents -->|MCP Protocol| Engine
 
-Arny needs [uv](https://docs.astral.sh/uv/) and Python 3.12+.
+    Engine -.->|Read| Luci
+    Engine -.->|Read| Granola
+    Engine -.->|Read| Life
+```
+
+---
+
+## What Arny Does
+
+1. **Answers in plain language**: Run `arny "what did I discuss with Sarah today?"` in your terminal. It checks your sources and summarizes the answer with citations. If no LLM key is set, it outputs cleanly ranked excerpts.
+2. **Plugs into your favorite agents**: Runs a standard [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server so tools like **Claude Code**, **Raycast AI**, and **Antigravity CLI** can search your history automatically.
+3. **Safe & Read-Only**: Arny only reads. It never writes to, moves, or alters your personal files or databases. If a tool isn't installed or running, Arny simply displays a polite warning and keeps going.
+
+---
+
+## Quickstart
+
+### 1. Run via CLI
+
+Arny runs directly via `uvx` without needing a permanent install:
 
 ```sh
+# Ask anything about your recent activity
+uvx arny "what did I work on today?"
+
+# Check available options
 uvx arny --help
-uvx arny "what did I work on today?"
 ```
 
-To run it from GitHub or a local checkout instead of PyPI:
+*(You can also run from git: `uvx --from git+https://github.com/akulafb/arny arny "<question>"`).*
 
-```sh
-uvx --from git+https://github.com/akulafb/arny arny --help
-uvx --from /path/to/arny arny "what did I work on today?"
-```
+---
 
-## Ask a question
+## Connect to Your AI Apps (MCP)
 
-```sh
-uvx arny "what did I work on today?"
-uvx arny ask what did I discuss about pricing   # same thing, explicit command
-```
-
-Arny queries Luci, Granola and History in parallel.
-
-- **With an LLM key set**, Arny writes a short answer. Each fact cites its source: `[Luci]`, `[Granola]` or `[History]`.
-- **With no key set**, Arny prints the matching excerpts, ranked and grouped by source.
-
-If the LLM call fails, Arny falls back to the excerpts. Warnings go to stderr.
-
-| Variable | Use |
-| --- | --- |
-| `GEMINI_API_KEY` | Use Gemini for answers. |
-| `ANTHROPIC_API_KEY` | Use Claude for answers. |
-| `OPENAI_API_KEY` | Use OpenAI for answers. |
-| `ARNY_LLM_PROVIDER` | Pick one provider (`gemini`, `anthropic`, `openai`) when several keys are set. Default order is the order above. |
-| `ARNY_LLM_MODEL` | Override the model name for the chosen provider. |
-
-### Source settings
-
-| Variable | Default | Use |
-| --- | --- | --- |
-| `LUCI_PATH` | `~/.local/bin/luci`, then `PATH` | Path to the `luci` binary. |
-| `GRANOLA_CLI_PATH` | Granola.app's bundled CLI | Path to the Granola CLI. |
-| `ARNY_GRANOLA_TOKEN` | unset | Granola public API token. |
-| `ARNY_GRANOLA_EXPORT_DIR` | unset | Folder of Granola CSV / Markdown exports. |
-| `LIFE_PATH` | `~/.Life` | Life folder for History. |
-| `FB_MODE_PATH` | `~/.fb-mode/runs` | Run notes for History. |
-
-## MCP server
-
-Start the stdio server with either command:
-
-```sh
-uvx arny serve
-uvx --from arny arny-mcp
-```
-
-Tools: `ping`, `status`, `search_luci`, `get_luci_transcripts`, `get_granola_meetings`, `get_granola_transcript`, `search_agent_history`.
+Arny provides an MCP server over stdio via `arny serve`.
 
 ### Raycast AI Chat
-
-1. Open Raycast. Run the **Install Server** command (MCP extension).
-2. Set **Name** to `arny`.
-3. Set **Command** to `uvx`.
-4. Set **Arguments** to `arny serve`.
-5. Save. In AI Chat, type `@arny` to use its tools.
-
-You can also paste this JSON into the Install Server form:
+1. In Raycast, run **Install Server** (under the MCP extension).
+2. Set **Name** to `arny`, **Command** to `uvx`, and **Arguments** to `arny serve`.
+3. In Raycast AI Chat, mention `@arny` to query your context.
 
 ```json
 {
@@ -92,18 +75,13 @@ You can also paste this JSON into the Install Server form:
 ```
 
 ### Claude Code CLI
-
+Run in your terminal:
 ```sh
 claude mcp add arny --scope user -- uvx arny serve
-claude mcp list
 ```
 
-To pass a source setting, add `-e`, for example `-e LIFE_PATH=$HOME/.Life`.
-
-### agy (Antigravity CLI)
-
-Add Arny to the global MCP config, `~/.gemini/config/mcp_config.json`:
-
+### Antigravity (agy CLI)
+Add Arny to `~/.gemini/config/mcp_config.json`:
 ```json
 {
   "mcpServers": {
@@ -115,15 +93,36 @@ Add Arny to the global MCP config, `~/.gemini/config/mcp_config.json`:
 }
 ```
 
-Restart agy. agy caches each server's tool list under `~/.gemini/antigravity-cli/mcp/arny/`. Do not edit that folder by hand.
+---
 
-## Develop
+## Configuration
+
+Arny works out of the box with zero configuration by looking for default paths. You can customize behavior using environment variables:
+
+### AI Synthesizer (Optional)
+When set, Arny drafts a synthesized summary. Without an API key, Arny simply shows matching excerpts.
+- `GEMINI_API_KEY`: Use Google Gemini.
+- `ANTHROPIC_API_KEY`: Use Claude.
+- `OPENAI_API_KEY`: Use OpenAI.
+
+### Custom Data Paths (Optional)
+- `LUCI_PATH`: Custom path to `luci` binary (defaults to `~/.local/bin/luci`).
+- `GRANOLA_CLI_PATH`: Custom path to Granola Companion CLI.
+- `ARNY_GRANOLA_EXPORT_DIR`: Folder containing exported Granola CSV or Markdown notes.
+- `LIFE_PATH`: Custom directory for personal notes (defaults to `~/.Life`).
+- `FB_MODE_PATH`: Custom directory for agent runs (defaults to `~/.fb-mode/runs`).
+
+---
+
+## Development & Testing
 
 ```sh
+# Install dependencies
 uv sync
+
+# Run tests (runs 100% offline with mocks)
 uv run pytest -q
-uv run arny --help
+
+# Test the CLI locally
 uv run arny "test query"
 ```
-
-The tests fake Luci, Granola and `~/.Life`. They do not need any of them installed.
