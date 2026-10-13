@@ -180,19 +180,23 @@ def test_default_caller_builds_provider_requests():
 
     def fake_post(url, headers, body):
         seen.append((url, headers, body))
+        if "openrouter" in url:
+            return {"choices": [{"message": {"content": "OR"}}]}
         if "anthropic" in url:
             return {"content": [{"type": "text", "text": "A"}]}
         if "openai" in url:
             return {"choices": [{"message": {"content": "O"}}]}
         return {"candidates": [{"content": {"parts": [{"text": "G"}]}}]}
 
-    env = {"ANTHROPIC_API_KEY": "a", "OPENAI_API_KEY": "o", "GEMINI_API_KEY": "g"}
+    env = {"OPENROUTER_API_KEY": "r", "ANTHROPIC_API_KEY": "a", "OPENAI_API_KEY": "o", "GEMINI_API_KEY": "g"}
+    assert synthesizer.call_llm("openrouter", "p", env, post=fake_post) == "OR"
     assert synthesizer.call_llm("anthropic", "p", env, post=fake_post) == "A"
     assert synthesizer.call_llm("openai", "p", env, post=fake_post) == "O"
     assert synthesizer.call_llm("gemini", "p", env, post=fake_post) == "G"
-    assert seen[0][1]["x-api-key"] == "a"
-    assert seen[1][1]["Authorization"] == "Bearer o"
-    assert seen[2][1]["x-goog-api-key"] == "g"
+    assert seen[0][1]["Authorization"] == "Bearer r"
+    assert seen[1][1]["x-api-key"] == "a"
+    assert seen[2][1]["Authorization"] == "Bearer o"
+    assert seen[3][1]["x-goog-api-key"] == "g"
 
 
 def test_gather_drops_duplicate_luci_text():

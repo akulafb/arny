@@ -1,8 +1,8 @@
 # Arny
 
-- **What is it:** Arny is an MCP Server that gives you quick-access to everyday context/memory-saving tools
+- **What is it:** Arny is my personal MCP Server that gives me quick-access to everyday context/memory-saving tools
 - **Currently built for:** Luci, Granola (maybe more later)
-- **What this means:** It's a unified way to ask about what you did/saw/heard on your computer from your favourite tools (AI agents, or my favourite, Raycast's Quick AI)
+- **What this means:** It's a unified way to ask about what I did/saw/heard on my computer from my favourite AI tools (especially Raycast Quick AI)
 
  
 
@@ -119,11 +119,14 @@ Arny works out of the box with zero configuration by looking for default paths. 
 
 ### AI Synthesizer (Optional)
 
-When set, Arny drafts a synthesized summary. Without an API key, Arny simply shows matching excerpts.
+When set, Arny drafts a synthesized summary. Without an API key, Arny simply shows matching excerpts. Keys can be set in your shell environment (`~/.zshrc`) or in a `.env` file (loaded automatically from current directory or `~/.arny/.env`):
 
+- `OPENROUTER_API_KEY`: Use OpenRouter (default model: `anthropic/claude-3.5-sonnet`).
 - `GEMINI_API_KEY`: Use Google Gemini.
 - `ANTHROPIC_API_KEY`: Use Claude.
 - `OPENAI_API_KEY`: Use OpenAI.
+- `ARNY_LLM_MODEL`: Override model name (e.g. `meta-llama/llama-3.3-70b-instruct`).
+- `ARNY_LLM_PROVIDER`: Manually choose provider (`openrouter`, `gemini`, `anthropic`, `openai`).
 
 ### Custom Data Paths (Optional)
 

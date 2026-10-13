@@ -22,13 +22,15 @@ from pydantic import BaseModel
 SourceName = Literal["Luci", "Granola", "History"]
 SOURCE_ORDER: tuple[SourceName, ...] = ("Luci", "Granola", "History")
 
-Provider = Literal["gemini", "anthropic", "openai"]
+Provider = Literal["openrouter", "gemini", "anthropic", "openai"]
 PROVIDER_KEYS: dict[Provider, str] = {
+    "openrouter": "OPENROUTER_API_KEY",
     "gemini": "GEMINI_API_KEY",
     "anthropic": "ANTHROPIC_API_KEY",
     "openai": "OPENAI_API_KEY",
 }
 DEFAULT_MODELS: dict[Provider, str] = {
+    "openrouter": "anthropic/claude-3.5-sonnet",
     "gemini": "gemini-2.5-flash",
     "anthropic": "claude-sonnet-5-5",
     "openai": "gpt-5-mini",
@@ -203,6 +205,13 @@ def call_llm(provider: Provider, prompt: str, env: Mapping[str, str], post: Post
             {"model": model, "max_tokens": 1024, "messages": [{"role": "user", "content": prompt}]},
         )
         return "".join(b.get("text", "") for b in data["content"] if b.get("type") == "text").strip()
+    if provider == "openrouter":
+        data = post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            {"Authorization": f"Bearer {key}", "HTTP-Referer": "https://github.com/akulafb/arny"},
+            {"model": model, "messages": [{"role": "user", "content": prompt}]},
+        )
+        return data["choices"][0]["message"]["content"].strip()
     if provider == "openai":
         data = post(
             "https://api.openai.com/v1/chat/completions",
