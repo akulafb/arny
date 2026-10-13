@@ -39,21 +39,39 @@ flowchart LR
 
 ---
 
-## Quickstart
+## Quickstart & Installation
 
-### 1. Run via CLI
+You can run Arny with or without installing it:
 
-Arny runs directly via `uvx` without needing a permanent install:
+### Option A: Install Globally (Recommended)
+Fastest startup, clean commands, and best for MCP apps:
 
 ```sh
-# Ask anything about your recent activity
-uvx arny "what did I work on today?"
+# Install from local checkout (edits take effect immediately)
+uv tool install --editable .
 
-# Check available options
-uvx arny --help
+# Or install from GitHub
+uv tool install git+https://github.com/akulafb/arny.git
+
+# Run directly
+arny "what did I work on today?"
 ```
 
-*(You can also run from git: `uvx --from git+https://github.com/akulafb/arny arny "<question>"`).*
+### Option B: Run Without Installing (`uvx`)
+Zero setup, runs in a temporary cache on the fly:
+
+```sh
+uvx --from git+https://github.com/akulafb/arny arny "what did I work on today?"
+```
+
+### With vs. Without Installation
+
+| | Installed (`uv tool install`) | Without Installing (`uvx`) |
+| :--- | :--- | :--- |
+| **Command** | Bare `arny "..."` | Prefixed `uvx arny "..."` |
+| **Startup** | Instant | Brief environment resolution check |
+| **Best For** | Daily use & AI app setups (Raycast, Claude, agy) | Quick trials or testing on another machine |
+| **Disk** | Symlinked in `~/.local/bin` | Runs in temporary cache, no global footprint |
 
 ---
 
